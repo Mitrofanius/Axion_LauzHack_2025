@@ -188,12 +188,13 @@ def run_sql(sql: str, row_limit: int = None):
         df = pd.read_sql_query(sql_to_run, conn)
     return df
 
-question = input("Question: ")
-answer = answer_user_question(
-    question,
-    run_sql
-)
-sql, dataframe, explanation = answer["sql"], answer["dataframe"], answer["explanation"]
-print("\nGenerated SQL:\n", sql)
-print("\nDataFrame Result:\n", dataframe)
-print("\nLLM Explanation of Results:\n", explanation)
+while True:
+    question = input("Axion is ready to answer your questions!\n ")
+    answer = answer_user_question(
+        question,
+        run_sql
+    )
+    sql, dataframe, explanation = answer["sql"], answer["dataframe"], answer["explanation"]
+    # print("\nGenerated SQL:\n", sql)
+    # print("\nDataFrame Result:\n", dataframe)
+    print("\n\nAnswer:\n", explanation)
