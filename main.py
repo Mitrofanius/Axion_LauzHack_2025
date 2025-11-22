@@ -105,7 +105,7 @@ DDL_STATEMENTS = [
     );
     """
 ]
-
+from analysis import transactions_stats, make_analysis_plot
 if __name__ == "__main__":
     # Load CSVs and preprocess
     data = load_all_data()
@@ -120,7 +120,12 @@ if __name__ == "__main__":
         return run_select_query(engine, sql)
 
     question = input("Question: ")
-    answer = answer_question(question, run_sql)
-    print("\nGenerated SQL:\n", answer["sql"])
-    print("\nDataFrame Result:\n", answer["dataframe"])
-    print("\nExplanation:\n", answer["explanation"])
+    if question.startswith("analysis"):
+        question = question[len("analysis "):].strip()
+        analysis = transactions_stats(question, run_sql)
+        make_analysis_plot(analysis)
+    else:
+        answer = answer_question(question, run_sql)
+        print("\nGenerated SQL:\n", answer["sql"])
+        print("\nDataFrame Result:\n", answer["dataframe"])
+        print("\nExplanation:\n", answer["explanation"])
