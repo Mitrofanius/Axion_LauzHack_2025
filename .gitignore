@@ -1,0 +1,6 @@
+**/__pycache__
+*.zip
+*.pdf
+data_old
+bank_data.db
+.python-version
