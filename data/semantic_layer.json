@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "Account": {
+      "description": "Bank account record. Defined by account.account_id. Has currency, open/close dates. Belongs to Business Relationships via br_to_account. Appears in ledger via transactions.",
+      "table": "account",
+      "key": "account_id"
+    },
+    "BusinessRelationship": {
+      "description": "Contractual shell connecting partners and accounts. Central object for FCC/AML investigations.",
+      "table": "business_rel",
+      "key": "br_id"
+    },
+    "Partner": {
+      "description": "Person or organisation onboarded with partner_id. Has class codes, address, birth_year, and phone number.",
+      "table": "partner",
+      "key": "partner_id"
+    },
+    "Transaction": {
+      "description": "Ledger entry. Use 'Transaction ID' to group debit/credit legs. Amounts are positive; use Debit/Credit flag to determine sign.",
+      "table": "transactions",
+      "key": "Transaction ID"
+    },
+    "PartnerCountry": {
+      "description": "Country-level attributes per partner (domicile, tax, mailing). partner_country_status_code = 1 indicates current row.",
+      "table": "partner_country",
+      "key": [
+        "partner_id",
+        "country_type"
+      ]
+    },
+    "PartnerRole": {
+      "description": "Links partners to BRs or other entities. Use entity_type to determine target type; entity_type='BR' links to business_rel.br_id.",
+      "table": "partner_role",
+      "key": [
+        "partner_id",
+        "entity_id",
+        "br_type_code"
+      ]
+    },
+    "BRToAccount": {
+      "description": "Junction mapping BRs to accounts. relationship_status_code = 1 indicates active link.",
+      "table": "br_to_account",
+      "key": [
+        "br_id",
+        "account_id"
+      ]
+    },
+    "Notes": {
+      "description": "Free-form onboarding text per partner.",
+      "table": "client_onboarding_notes",
+      "key": "Partner_ID"
+    }
+  },
+  "relationships": [
+    {
+      "from": "Account",
+      "to": "BusinessRelationship",
+      "via": "br_to_account",
+      "join": "account.account_id = br_to_account.account_id AND business_rel.br_id = br_to_account.br_id"
+    },
+    {
+      "from": "BusinessRelationship",
+      "to": "Partner",
+      "via": "partner_role",
+      "join": "business_rel.br_id = partner_role.entity_id AND partner_role.entity_type = 'BR'"
+    },
+    {
+      "from": "Partner",
+      "to": "PartnerCountry",
+      "via": "partner_country",
+      "join": "partner.partner_id = partner_country.partner_id AND partner_country.partner_country_status_code = 1"
+    },
+    {
+      "from": "Account",
+      "to": "Transaction",
+      "via": "transactions",
+      "join": "account.account_id = transactions.\"Account ID\""
+    },
+    {
+      "from": "Account",
+      "to": "Account (counterparty)",
+      "via": "transactions",
+      "join": "transactions.counterparty_Account_ID = account.account_id"
+    }
+  ],
+  "business_rules": [
+    "Blank close date means the entity is active (account_close_date or br_close_date or partner_close_date).",
+    "relationship_status_code = 1 indicates an active BR<->Account link.",
+    "partner_country_status_code = 1 marks the current country row for a given country_type.",
+    "Transaction Amount is positive; use Debit/Credit to infer sign."
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "account": {
+    "account_id": "TEXT (PRIMARY KEY)",
+    "account_iban": "TEXT",
+    "account_currency": "TEXT",
+    "account_open_date": "DATE",
+    "account_close_date": "DATE"
+  },
+  "business_rel": {
+    "br_id": "TEXT (PRIMARY KEY)",
+    "br_open_date": "DATE",
+    "br_close_date": "DATE"
+  },
+  "br_to_account": {
+    "br_id": "TEXT (FOREIGN KEY -> business_rel.br_id)",
+    "account_id": "TEXT (FOREIGN KEY -> account.account_id)",
+    "relationship_id": "TEXT",
+    "relationship_status_code": "INTEGER",
+    "PRIMARY_KEY": ["br_id", "account_id"]
+  },
+  "partner": {
+    "partner_id": "TEXT (PRIMARY KEY)",
+    "industry_gic2_code": "TEXT",
+    "partner_class_code": "TEXT",
+    "partner_gender": "TEXT",
+    "partner_name": "TEXT",
+    "partner_phone_number": "TEXT",
+    "partner_birth_year": "DATE",
+    "partner_address": "TEXT",
+    "partner_open_date": "DATE",
+    "partner_close_date": "DATE"
+  },
+  "client_onboarding_notes": {
+    "Partner_ID": "TEXT (PRIMARY KEY, FOREIGN KEY -> partner.partner_id)",
+    "Onboarding_Note": "TEXT"
+  },
+  "partner_country": {
+    "partner_id": "TEXT (FOREIGN KEY -> partner.partner_id)",
+    "country_type": "TEXT",
+    "country_name": "TEXT",
+    "partner_country_status_code": "INTEGER",
+    "PRIMARY_KEY": ["partner_id", "country_type"]
+  },
+  "partner_role": {
+    "partner_id": "TEXT (FOREIGN KEY -> partner.partner_id)",
+    "entity_type": "TEXT",
+    "entity_id": "TEXT",
+    "relationship_start_date": "DATE",
+    "relationship_end_date": "DATE",
+    "br_type_code": "TEXT",
+    "associated_partner_id": "TEXT (FOREIGN KEY -> partner.partner_id)",
+    "partner_class_code": "TEXT",
+    "PRIMARY_KEY": ["partner_id", "entity_id", "br_type_code"]
+  },
+  "transactions": {
+    "Transaction ID": "TEXT (PRIMARY KEY)",
+    "Debit/Credit": "TEXT",
+    "Account ID": "TEXT (FOREIGN KEY -> account.account_id)",
+    "Amount": "REAL",
+    "Balance": "REAL",
+    "Currency": "TEXT",
+    "Date": "TIMESTAMP",
+    "Transfer_Type": "TEXT",
+    "counterparty_Account_ID": "TEXT (FOREIGN KEY -> account.account_id)",
+    "ext_counterparty_Account_ID": "TEXT",
+    "ext_counterparty_country": "TEXT"
+  }
+}
