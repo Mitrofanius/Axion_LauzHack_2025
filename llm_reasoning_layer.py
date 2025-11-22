@@ -156,7 +156,6 @@ def generate_sql_from_nl(user_question: str) -> str:
     Returns the sanitized SQL ready to execute via run_sql_func.
     """
     prompt = build_sql_generation_prompt(user_question, schema_info, semantic_layer)
-    print("SQL Generation Prompt:\n", prompt)
     raw_response = llm_call(prompt)
 
     # Extract plain SQL from response and sanitize/validate

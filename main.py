@@ -1,8 +1,5 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
-import uuid
-import time
-from datetime import datetime, timezone
 from llm_reasoning_layer import answer_user_question
 
 DB_URI = "sqlite:///bank_data.db"
@@ -36,6 +33,7 @@ partner = load_csv("partner")
 partner_country = load_csv("partner_country")
 partner_role = load_csv("partner_role")
 transactions = load_csv("transactions")
+
 
 account = to_date(account, ["account_open_date", "account_close_date"])
 business_rel = to_date(business_rel, ["br_open_date", "br_close_date"])
@@ -172,7 +170,7 @@ partner.to_sql("partner", engine, if_exists="append", index=False)
 client_onboarding_notes.to_sql("client_onboarding_notes", engine, if_exists="append", index=False)
 partner_country.to_sql("partner_country", engine, if_exists="append", index=False)
 partner_role.to_sql("partner_role", engine, if_exists="append", index=False)
-# transactions.to_sql("transactions", engine, if_exists="append", index=False)
+transactions.to_sql("transactions", engine, if_exists="append", index=False)
 
 
 def run_sql(sql: str, row_limit: int = None):
