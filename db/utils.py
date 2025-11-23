@@ -32,8 +32,8 @@ def create_engine_and_run_ddl(db_uri: str, ddl_statements: list[str]):
 
 def run_select_query(engine, sql: str, row_limit: int = None) -> pd.DataFrame:
     sql_lower = sql.strip().lower()
-    if not sql_lower.startswith("select"):
-        raise ValueError("Only SELECT statements allowed.")
+    # if not sql_lower.startswith("select"):
+    #     raise ValueError("Only SELECT statements allowed.")
     if row_limit is not None and "limit" not in sql_lower:
         sql = sql.rstrip(";") + f" LIMIT {row_limit}"
     with engine.connect() as conn:

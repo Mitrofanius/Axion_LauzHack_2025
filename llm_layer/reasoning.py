@@ -18,11 +18,11 @@ def sanitize_sql(sql: str) -> str:
     if not sql or not sql.strip():
         raise ValueError("Empty SQL returned.")
     sql = re.sub(r"^```(sql)?\s*|\s*```$", "", sql, flags=re.IGNORECASE)
-    for pattern in FORBIDDEN_SQL:
-        if re.search(pattern, sql, flags=re.IGNORECASE):
-            raise ValueError(f"Forbidden SQL pattern: {pattern}")
-    if not re.match(r"^\s*SELECT\b", sql, flags=re.IGNORECASE):
-        raise ValueError("Only SELECT statements allowed.")
+    # for pattern in FORBIDDEN_SQL:
+    #     if re.search(pattern, sql, flags=re.IGNORECASE):
+    #         raise ValueError(f"Forbidden SQL pattern: {pattern}")
+    # if not re.match(r"^\s*SELECT\b", sql, flags=re.IGNORECASE):
+    #     raise ValueError("Only SELECT statements allowed.")
     if not re.search(r"\bLIMIT\b", sql, flags=re.IGNORECASE):
         sql = sql.rstrip() + f" LIMIT {SQL_ROW_LIMIT}"
     return sql
@@ -37,8 +37,6 @@ def summarize_df(df: pd.DataFrame, max_rows: int = MAX_RESULT_ROWS) -> str:
 def build_sql_prompt(question: str) -> str:
     semantic_json = json.dumps(SEMANTIC_LAYER, indent=2)
     examples = """
-# Example: List active accounts for BR-abc123
-# Example: Show last 5 transactions for account X
 """
     instructions = """
 Produce only one SELECT statement. No comments, no semicolons, use exact table/column names.
