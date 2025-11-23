@@ -1,7 +1,8 @@
 import pandas as pd
 from matplotlib.gridspec import GridSpec
 import matplotlib.pyplot as plt
-
+import matplotlib
+matplotlib.use("Agg")  # Non-GUI backend for saving files only
 
 def get_partner_account_ids(partner: str, run_sql) -> list[str]:
 	sql = f"""
