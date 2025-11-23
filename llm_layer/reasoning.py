@@ -64,11 +64,10 @@ def build_explanation_prompt(question: str, sql: str, df: pd.DataFrame) -> str:
     summary = summarize_df(df)
     semantic_json = json.dumps(SEMANTIC_LAYER, indent=2)
     return f"""
+Your task is to answer the user question based on the results of data obtained by querying the database.
+
 User Question:
 {question}
-
-SQL Executed:
-{sql}
 
 Result Summary:
 {summary}
@@ -76,7 +75,7 @@ Result Summary:
 Semantic Layer:
 {semantic_json}
 
-Task: Provide a concise explanation (3-7 sentences) of what the SQL returned.
+Answer the question of the user. The dataframe will also be made available to the user, so don't include redundant markdown-style tabular data.
 """
 
 def generate_sql(question: str) -> str:

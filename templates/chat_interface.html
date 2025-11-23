@@ -63,6 +63,8 @@
         .message {
             margin-bottom: 1rem;
             display: flex;
+            align-items: flex-start;
+            /* ensure avatar and content align at top */
         }
 
         .message.user {
@@ -71,6 +73,17 @@
 
         .message.assistant {
             justify-content: flex-start;
+            /* keep avatar + content on the left */
+        }
+
+        /* Avatar for assistant messages */
+        .assistant-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
         }
 
         .message-content {
@@ -103,18 +116,48 @@
             border-radius: 0.25rem;
         }
 
-        .sql-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #4b5563;
-            margin-bottom: 0.25rem;
+        .sql-toggle {
+            margin-top: 0.75rem;
         }
 
-        .sql-code {
-            font-size: 0.75rem;
-            color: #1f2937;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
+        .sql-toggle-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .sql-toggle-button .chev {
+            display: inline-block;
+            transition: transform 0.18s ease;
+            transform-origin: center;
+            font-size: 0.85rem;
+        }
+
+        .sql-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease, padding 0.18s ease;
+            border: 1px solid #e5e7eb;
+            border-top: 0;
+            background: #f9fafb;
+            padding: 0 0.75rem;
+            border-bottom-left-radius: 0.25rem;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .sql-content.open {
+            max-height: 600px;
+            /* large enough to show SQL */
+            padding: 0.75rem;
         }
 
         .data-table-wrapper {
@@ -246,9 +289,13 @@
 </head>
 
 <body>
-    <div class="header">
-        <h1>Financial Compliance Copilot</h1>
-        <p>Analyze financial transactions and investigate compliance breaches</p>
+    <div class="header" style="display: flex; align-items: center; gap: 0.75rem;">
+        <img src="/static/images/axion.jpg" alt="Axion logo"
+            style="width:48px; height:48px; border-radius:8px; object-fit:cover;">
+        <div>
+            <h1>Axion</h1>
+            <p>Analyze financial transactions and investigate compliance breaches</p>
+        </div>
     </div>
 
     <div class="messages-container" id="messages">
@@ -261,7 +308,7 @@
 
     <div class="input-container">
         <div class="input-wrapper">
-            <input type="text" id="question-input" placeholder="Ask a question about your banking data..."
+            <input type="text" id="question-input" placeholder="Axion is ready to answer your questions"
                 autocomplete="off">
             <button id="send-button">Send</button>
         </div>
@@ -282,7 +329,18 @@
 
             if (role === 'user') {
                 contentDiv.textContent = content;
+                // user messages: content only
+                messageDiv.appendChild(contentDiv);
             } else {
+                // assistant (and other non-user) messages: include avatar for assistant role
+                if (role === 'assistant') {
+                    const avatar = document.createElement('img');
+                    avatar.src = '/static/images/axion.jpg';
+                    avatar.alt = 'Axion';
+                    avatar.className = 'assistant-avatar';
+                    messageDiv.appendChild(avatar);
+                }
+
                 const textDiv = document.createElement('div');
                 textDiv.style.whiteSpace = 'pre-wrap';
                 textDiv.innerHTML = formatText(content);
@@ -292,10 +350,28 @@
                     const sqlBlock = document.createElement('div');
                     sqlBlock.className = 'sql-block';
                     sqlBlock.innerHTML = `
-                        <div class="sql-label">SQL Query:</div>
-                        <code class="sql-code">${escapeHtml(data.sql)}</code>
+                        <div class="sql-toggle">
+                            <button class="sql-toggle-button" aria-expanded="false" type="button">
+                                <span class="chev">▶</span>
+                                <span class="sql-label">SQL Query</span>
+                            </button>
+                            <div class="sql-content" aria-hidden="true">
+                                <code class="sql-code">${escapeHtml(data.sql)}</code>
+                            </div>
+                        </div>
                     `;
                     contentDiv.appendChild(sqlBlock);
+
+                    // Attach toggle behavior
+                    const toggleBtn = sqlBlock.querySelector('.sql-toggle-button');
+                    const sqlContent = sqlBlock.querySelector('.sql-content');
+                    const chev = toggleBtn.querySelector('.chev');
+                    toggleBtn.addEventListener('click', () => {
+                        const isOpen = sqlContent.classList.toggle('open');
+                        toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                        sqlContent.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+                        chev.style.transform = isOpen ? 'rotate(90deg)' : 'rotate(0deg)';
+                    });
                 }
 
                 if (data.dataframe) {
@@ -341,9 +417,9 @@
                     `;
                     contentDiv.appendChild(imageWrapper);
                 }
-            }
 
-            messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(contentDiv);
+            }
 
             const welcome = messagesContainer.querySelector('.welcome');
             if (welcome) welcome.remove();
