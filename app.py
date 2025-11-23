@@ -3,6 +3,8 @@ from flask_cors import CORS
 import base64
 import os
 from pathlib import Path
+from flask import Flask, render_template
+
 
 from db.etl import load_all_data
 from db.utils import create_engine_and_run_ddl, run_select_query
@@ -190,4 +192,4 @@ def health():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, host="0.0.0.0")
